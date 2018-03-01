@@ -107,8 +107,8 @@ class index():
         print "Unique words: " + str(self.unique_words + self.stop_words.__len__())
         f = open('index.txt', 'w')
         sorted(self.index.items(), key=lambda x: x[1], reverse=True)
-        for key, value in self.index:
-            f.write(str(key) + ": " + str(value) + "\n")
+        for key in self.index:
+            f.write(str(key) + ": " + str(index[key]) + "\n")
         f.close()
 
 if __name__ == "__main__":
