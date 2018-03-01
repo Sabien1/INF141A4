@@ -49,8 +49,8 @@ class index():
                 tokens = self.remove_number_tokens(tokens)
                 #print tokens
                 self.add_to_index(tokens)
-                print self.index
-
+                #print self.index
+        self.print_report()
 
 
         '''====Left off here, take tokens list and insert into dict, count frequencies, print to file.'''
@@ -96,10 +96,15 @@ class index():
     def add_to_index(self, token_list):
         '''Parses list of tokens and adds to the index if they don't exist yet'''
         for token in token_list:
-            if self.index.has_key(token):
+            if token in self.index:
                 self.index[token] = self.index[token] + 1
             else:
                 self.index[token] = 1
+                self.unique_words = self.unique_words + 1
+
+    def print_report(self):
+        '''print data required for report.'''
+        print "Unique words: " + str(self.unique_words)
 
 
 if __name__ == "__main__":
