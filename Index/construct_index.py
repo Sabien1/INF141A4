@@ -1,7 +1,20 @@
 import re
 from nltk.stem.snowball import SnowballStemmer
+import os
+
 
 class index():
+
+    def build_index(self):
+
+        root = "..\\WEBPAGES_RAW"
+
+        for path, subdirs, files in os.walk(root):
+            for name in files:
+                print path
+                print name
+
+
 
     def tokenize(self, raw_input):
         '''Function takes a string and splits it into a list of individual words, mutated to lowercase'''
@@ -26,4 +39,5 @@ class index():
 if __name__ == "__main__":
     test = index()
 
-    test.stem(test.tokenize("Hello my name is Bob.  I'm awesome, and I'm not married.  Glory be to the gods.  Words, tokenization, glorification"))
+    #test.stem(test.tokenize("Hello my name is Bob.  I'm awesome, and I'm not married.  Glory be to the gods.  Words, tokenization, glorification"))
+    test.build_index()
