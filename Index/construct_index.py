@@ -104,11 +104,13 @@ class index():
 
     def print_report(self):
         '''print data required for report.'''
-        print "Unique words: " + str(self.unique_words)
-
+        print "Unique words: " + str(self.unique_words + self.stop_words.__len__())
+        f = open('index.txt', 'w')
+        sorted(self.index.items(), key=lambda x: x[1], reverse=True)
+        for key, value in self.index:
+            f.write(str(key) + ": " + str(value) + "\n")
+        f.close()
 
 if __name__ == "__main__":
     test = index()
-
-    #test.stem(test.tokenize("Hello my name is Bob.  I'm awesome, and I'm not married.  Glory be to the gods.  Words, tokenization, glorification"))
     test.build_index()
