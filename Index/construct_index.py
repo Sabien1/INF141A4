@@ -1,18 +1,42 @@
 import re
 from nltk.stem.snowball import SnowballStemmer
 import os
-
+from bs4 import BeautifulSoup
+from bs4.element import Comment
 
 class index():
+    index = dict()
+
+    def __init__(self):
+        print "init"
+
+    '''Function tag_visible sourced from https://stackoverflow.com/questions/1936466/beautifulsoup-grab-visible-webpage-text'''
+    def tag_visible(self, element):
+        if element.parent.name in ['style', 'script', 'head', 'title', 'meta', '[document]']:
+            return False
+        if isinstance(element, Comment):
+            return False
+        return True
+
+    '''Function text_from_html sourced from https://stackoverflow.com/questions/1936466/beautifulsoup-grab-visible-webpage-text'''
+    def text_from_html(self, body):
+        soup = BeautifulSoup(body, 'html.parser')
+        texts = soup.findAll(text=True)
+        visible_texts = filter(self.tag_visible, texts)
+        return u" ".join(t.strip() for t in visible_texts)
 
     def build_index(self):
-
-        root = "..\\WEBPAGES_RAW"
-
+        '''Build the index'''
+        '''root = "..\\WEBPAGES_RAW"
+        Loop through all the dirs, extract content in each file.
         for path, subdirs, files in os.walk(root):
-            for name in files:
-                print path
-                print name
+            for current_file in files:
+                print current_file'''
+
+        html_source = open("C:\\Users\\resca\\Documents\\test.html").read()
+        print self.text_from_html(html_source)
+
+
 
 
 
