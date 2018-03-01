@@ -108,7 +108,7 @@ class index():
         f = open('index.txt', 'w')
         sorted(self.index.items(), key=lambda x: x[1], reverse=True)
         for key in self.index:
-            f.write(str(key) + ": " + str(index[key]) + "\n")
+            f.write(str(key) + ": " + str(self.index[key]) + "\n")
         f.close()
 
 if __name__ == "__main__":
