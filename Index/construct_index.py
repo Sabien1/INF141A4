@@ -6,15 +6,38 @@ from bs4.element import Comment
 import string
 import unicodedata
 from nltk.corpus import stopwords
+from collections import defaultdict
+import math
 
 class index():
-    index = dict()
+    '''Calculate an inverse index of a corpus'''
+
+    '''term_unique_count is dictionary to keep track of total unique occurrances of each term in entire corpus'''
+    term_unique_count = dict()
+
+    '''term_frequency is the number of times a term appears in a given document'''
+    term_frequency = defaultdict(int)
+
+    '''document_index is the mapping of terms to their doc_id (record of which documents a term appeared in)'''
+    document_index = defaultdict(list)
+
+    '''tf_idf_score keeps track of the tf-idf score of each term'''
+    tf_idf_score = defaultdict(float)
+
+    '''doc_term_count is the number of times a key term appeared in a specific document.'''
+    doc_term_count = defaultdict(defaultdict(int))
+
     stop_words = set(stopwords.words('english'))
     documents = 0
     unique_words = 0
     index_size = 0
     def __init__(self):
+        '''Count directories in root dir, for idf calculation'''
         print "init"
+        root = "..\\WEBPAGES_RAW\\"
+        for root, dirs, files in os.walk(root):
+            self.documents += len(files)
+        #print str(self.documents) + " files exist."
 
     '''Function tag_visible sourced from https://stackoverflow.com/questions/1936466/beautifulsoup-grab-visible-webpage-text'''
     def tag_visible(self, element):
@@ -33,26 +56,61 @@ class index():
         visible_texts = filter(self.tag_visible, texts)
         return u" ".join(t.strip() for t in visible_texts)
 
+    def calculate_idf(self, df):
+        idf = math.log((self.documents / df), 10)
+        return idf
+
+    def calculate_tf(selfself, tf):
+        wtf = 1 + math.log(tf, 10)
+        return wtf
+
     def build_index(self):
         '''Build the index.  Loops through all files, passes to helper functions to parse html and tokenize/stem'''
         root = "..\\WEBPAGES_RAW\\"
         '''Loop through all the dirs, extract content in each file.'''
         for path, subdirs, files in os.walk(root):
             for current_file in files:
+                self.term_frequency.clear()
+                #print "Path: " + str(path)
+                #print "Subidrs is " + str(subdirs)
+                #print "File: " + str(files)
+                #print "Current file: " + str(current_file)
+                parent_directory = path.split(os.path.sep)[-1]
+
+                doc_ID = str(parent_directory + "\\" + current_file)
+                #print doc_ID
+
+                #print "Parent:  " + str(parent_directory)
                 current_path = path + "\\" + current_file
                 html_source = open(current_path).read()
                 #print self.text_from_html(html_source)
                 tokens = self.tokenize(self.text_from_html(html_source))
                 tokens = self.stem(tokens)
-                #print tokens
                 #print "Removing number strings"
                 tokens = self.remove_number_tokens(tokens)
+                for token in tokens:
+                    if token in self.term_unique_count:
+                        self.term_unique_count[token] += 1
+                    else:
+                        self.term_unique_count[token] = 1
+                        self.unique_words = self.unique_words + 1
+                    self.document_index[token].append(doc_ID)
+                    self.term_frequency[token] += 1
+
+                    self.doc_term_count[]
+
+                print self.doc_term_count
+                #print self.term_unique_count
+                #print self.document_index
                 #print tokens
-                self.add_to_index(tokens)
+                ##self.add_to_index(tokens)
                 #print self.index
+        for key in self.document_index:
+            df = len(self.document_index[key])
+            print self.calculate_idf(df)
         self.print_report()
 
-
+        return
         '''====Left off here, take tokens list and insert into dict, count frequencies, print to file.'''
 
 
@@ -77,15 +135,18 @@ class index():
             normal_string = stemmer.stem(item)
             normal_string = self.normalize_unicode(normal_string)
             stemmed_list.append(normal_string)
-        #print stemmed_list
-        #print "exiting stemmed function."
         return stemmed_list
 
     def remove_number_tokens(self, token_list):
         '''parse the list and remove all tokens that are numbers only.'''
-        for item in token_list:
-            if item.isdigit():
-                token_list.remove(item)
+        length = token_list.__len__()
+        i = 0
+        while i < length:
+            if self.is_number(token_list[i]):
+                del token_list[i]
+                length -= 1
+            else:
+                i += 1
         return token_list
 
     def normalize_unicode(self, string):
@@ -93,14 +154,32 @@ class index():
         string = unicodedata.normalize('NFKD', string).encode('ascii', 'ignore')
         return string
 
-    def add_to_index(self, token_list):
-        '''Parses list of tokens and adds to the index if they don't exist yet'''
-        for token in token_list:
-            if token in self.index:
-                self.index[token] = self.index[token] + 1
-            else:
-                self.index[token] = 1
-                self.unique_words = self.unique_words + 1
+    '''function is depricated'''
+    #def add_to_index(self, token_list):
+        #'''Parses list of tokens and adds to the index if they don't exist yet'''
+        #for token in token_list:
+            #if token in self.index:
+                #self.index[token] = self.index[token] + 1
+           # else:
+                #self.index[token] = 1
+               # self.unique_words = self.unique_words + 1
+
+    '''is_number function sourced from https://www.pythoncentral.io/how-to-check-if-a-string-is-a-number-in-python-including-unicode/'''
+    def is_number(self, s):
+        '''determine if the string s is a digit.'''
+        try:
+            float(s)
+            return True
+        except ValueError:
+            pass
+        try:
+            import unicodedata
+            unicodedata.numeric(s)
+            return True
+        except (TypeError, ValueError):
+            pass
+        return False
+
 
     def print_report(self):
         '''print data required for report.'''
@@ -110,6 +189,8 @@ class index():
         for key in self.index:
             f.write(str(key) + ": " + str(self.index[key]) + "\n")
         f.close()
+
+
 
 if __name__ == "__main__":
     test = index()
