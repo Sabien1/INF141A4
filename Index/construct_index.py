@@ -17,7 +17,7 @@ class index():
     '''term_frequency is the number of times a term appears in a given document'''
     term_frequency = defaultdict(int)
 
-    '''document_index is the mapping of terms to their doc_id (record of which documents a term appeared in)'''
+    '''document_index is the mapping of terms to their doc_id (record of which documents a term appeared in) (AKA posting list)'''
     document_index = defaultdict(list)
 
     '''tf_idf_score keeps track of the tf-idf score of each term'''
@@ -30,13 +30,12 @@ class index():
     documents = 0
     unique_words = 0
     index_size = 0
+
     def __init__(self):
         '''Count directories in root dir, for idf calculation'''
-        print "init"
         root = "..\\WEBPAGES_RAW\\"
         for root, dirs, files in os.walk(root):
             self.documents += len(files)
-        #print str(self.documents) + " files exist."
 
     '''Function tag_visible sourced from https://stackoverflow.com/questions/1936466/beautifulsoup-grab-visible-webpage-text'''
     def tag_visible(self, element):
@@ -56,10 +55,13 @@ class index():
         return u" ".join(t.strip() for t in visible_texts)
 
     def calculate_idf(self, df):
-        idf = math.log((self.documents / df), 10)
+        if df == 0:
+            return 0
+        else:
+            idf = math.log((self.documents / df), 10)
         return idf
 
-    def calculate_tf(selfself, tf):
+    def calculate_tf(self, tf):
         wtf = 1 + math.log(tf, 10)
         return wtf
 
@@ -69,23 +71,17 @@ class index():
         '''Loop through all the dirs, extract content in each file.'''
         for path, subdirs, files in os.walk(root):
             for current_file in files:
+                '''clear term_frequency for next HTML file'''
                 self.term_frequency.clear()
-                #print "Path: " + str(path)
-                #print "Subidrs is " + str(subdirs)
-                #print "File: " + str(files)
-                #print "Current file: " + str(current_file)
+                '''Get the parent directory, used to map terms to "doc_ID"'''
                 parent_directory = path.split(os.path.sep)[-1]
-
+                ''''''
                 doc_ID = str(parent_directory + "\\" + current_file)
-                #print doc_ID
 
-                #print "Parent:  " + str(parent_directory)
                 current_path = path + "\\" + current_file
                 html_source = open(current_path).read()
-                #print self.text_from_html(html_source)
                 tokens = self.tokenize(self.text_from_html(html_source))
                 tokens = self.stem(tokens)
-                #print "Removing number strings"
                 tokens = self.remove_number_tokens(tokens)
                 for token in tokens:
                     if token in self.term_unique_count:
@@ -99,26 +95,15 @@ class index():
                 for token2 in tokens:
                     self.doc_term_count[token2][doc_ID] = self.term_frequency[token2]
 
-                print self.doc_term_count
-
-
-                    #print self.doc_term_count
-                #print self.doc_term_count
-                #print self.term_unique_count
-                #print self.document_index
-                #print tokens
-                ##self.add_to_index(tokens)
-                #print self.index
-        for token3 in
-
-        for key in self.document_index:
-            df = len(self.document_index[key])
-            print self.calculate_idf(df)
-        self.print_report()
-
+        for token3 in self.doc_term_count:
+            print "Term: " + str(token3)
+            for doc in self.doc_term_count[token3]:
+                tf = self.calculate_tf(self.doc_term_count[token3][doc])
+                idf = self.calculate_idf(len(self.document_index[token3]))
+                tf_idf = tf * idf
+                print "\t" + str(doc) + ": " + str(tf_idf)
+        #print self.print_report()
         return
-        '''====Left off here, take tokens list and insert into dict, count frequencies, print to file.'''
-
 
     def tokenize(self, raw_input):
         '''Function takes a string and splits it into a list of individual words, mutated to lowercase'''
@@ -160,16 +145,6 @@ class index():
         string = unicodedata.normalize('NFKD', string).encode('ascii', 'ignore')
         return string
 
-    '''function is depricated'''
-    #def add_to_index(self, token_list):
-        #'''Parses list of tokens and adds to the index if they don't exist yet'''
-        #for token in token_list:
-            #if token in self.index:
-                #self.index[token] = self.index[token] + 1
-           # else:
-                #self.index[token] = 1
-               # self.unique_words = self.unique_words + 1
-
     '''is_number function sourced from https://www.pythoncentral.io/how-to-check-if-a-string-is-a-number-in-python-including-unicode/'''
     def is_number(self, s):
         '''determine if the string s is a digit.'''
@@ -186,17 +161,25 @@ class index():
             pass
         return False
 
-
     def print_report(self):
         '''print data required for report.'''
-        print "Unique words: " + str(self.unique_words + self.stop_words.__len__())
         f = open('index.txt', 'w')
-        sorted(self.index.items(), key=lambda x: x[1], reverse=True)
+        print "Unique words: " + str(self.unique_words + self.stop_words.__len__())
+        print "Total documents: " + str(self.documents)
+
+        for token3 in self.doc_term_count:
+            print "Term: " + str(token3)
+            f.write(str)
+            for doc in self.doc_term_count[token3]:
+                tf = self.calculate_tf(self.doc_term_count[token3][doc])
+                idf = self.calculate_idf(len(self.document_index[token3]))
+                tf_idf = tf * idf
+                print "\t" + str(doc) + ": " + str(tf_idf)
+
         for key in self.index:
             f.write(str(key) + ": " + str(self.index[key]) + "\n")
         f.close()
         print "I work hard every fucking day."
-
 
 
 if __name__ == "__main__":
