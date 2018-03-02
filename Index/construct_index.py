@@ -3,7 +3,6 @@ from nltk.stem.snowball import SnowballStemmer
 import os
 from bs4 import BeautifulSoup
 from bs4.element import Comment
-import string
 import unicodedata
 from nltk.corpus import stopwords
 from collections import defaultdict
@@ -22,10 +21,10 @@ class index():
     document_index = defaultdict(list)
 
     '''tf_idf_score keeps track of the tf-idf score of each term'''
-    tf_idf_score = defaultdict(float)
+    tf_idf_weight = defaultdict(float)
 
     '''doc_term_count is the number of times a key term appeared in a specific document.'''
-    doc_term_count = defaultdict(defaultdict(int))
+    doc_term_count = defaultdict(lambda: defaultdict(int))
 
     stop_words = set(stopwords.words('english'))
     documents = 0
@@ -97,14 +96,21 @@ class index():
                     self.document_index[token].append(doc_ID)
                     self.term_frequency[token] += 1
 
-                    self.doc_term_count[]
+                for token2 in tokens:
+                    self.doc_term_count[token2][doc_ID] = self.term_frequency[token2]
 
                 print self.doc_term_count
+
+
+                    #print self.doc_term_count
+                #print self.doc_term_count
                 #print self.term_unique_count
                 #print self.document_index
                 #print tokens
                 ##self.add_to_index(tokens)
                 #print self.index
+        for token3 in
+
         for key in self.document_index:
             df = len(self.document_index[key])
             print self.calculate_idf(df)
@@ -189,6 +195,7 @@ class index():
         for key in self.index:
             f.write(str(key) + ": " + str(self.index[key]) + "\n")
         f.close()
+        print "I work hard every fucking day."
 
 
 
