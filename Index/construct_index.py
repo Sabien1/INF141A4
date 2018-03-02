@@ -165,19 +165,19 @@ class index():
         '''print data required for report.'''
         f = open('index.txt', 'w')
         print "Unique words: " + str(self.unique_words + self.stop_words.__len__())
+        f.write("Unique words: " + str(self.unique_words + self.stop_words.__len__()))
         print "Total documents: " + str(self.documents)
+        f.write("\nTotal documents: " + str(self.documents) + "\n")
 
         for token3 in self.doc_term_count:
             print "Term: " + str(token3)
-            f.write(str)
+            f.write("Term: " + str(token3))
             for doc in self.doc_term_count[token3]:
                 tf = self.calculate_tf(self.doc_term_count[token3][doc])
                 idf = self.calculate_idf(len(self.document_index[token3]))
                 tf_idf = tf * idf
                 print "\t" + str(doc) + ": " + str(tf_idf)
-
-        for key in self.index:
-            f.write(str(key) + ": " + str(self.index[key]) + "\n")
+                f.write("\n\t" + str(doc) + ": " + str(tf_idf))
         f.close()
         print "I work hard every fucking day."
 
