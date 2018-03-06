@@ -7,6 +7,7 @@ import unicodedata
 from nltk.corpus import stopwords
 from collections import defaultdict
 import math
+import winsound
 
 class index():
     '''Calculate an inverse index of a corpus'''
@@ -58,11 +59,11 @@ class index():
         if df == 0:
             return 0
         else:
-            idf = math.log((self.documents / df), 10)
+            idf = math.log10((float(self.documents) / float(df)))
         return idf
 
     def calculate_tf(self, tf):
-        wtf = 1 + math.log(tf, 10)
+        wtf = 1 + math.log10(float(tf))
         return wtf
 
     def build_index(self):
@@ -95,14 +96,14 @@ class index():
                 for token2 in tokens:
                     self.doc_term_count[token2][doc_ID] = self.term_frequency[token2]
 
-        for token3 in self.doc_term_count:
-            print "Term: " + str(token3)
-            for doc in self.doc_term_count[token3]:
-                tf = self.calculate_tf(self.doc_term_count[token3][doc])
-                idf = self.calculate_idf(len(self.document_index[token3]))
-                tf_idf = tf * idf
-                print "\t" + str(doc) + ": " + str(tf_idf)
-        #print self.print_report()
+        #for token3 in self.doc_term_count:
+            #print "Term: " + str(token3)
+            #for doc in self.doc_term_count[token3]:
+               # tf = self.calculate_tf(self.doc_term_count[token3][doc])
+               # idf = self.calculate_idf(len(self.document_index[token3]))
+               # tf_idf = tf * idf
+               # print "\t" + str(doc) + ": " + str(tf_idf)
+        self.print_report()
         return
 
     def tokenize(self, raw_input):
@@ -182,6 +183,10 @@ class index():
         print "I work hard every fucking day."
 
 
+
 if __name__ == "__main__":
     test = index()
     test.build_index()
+    duration = 1000  # millisecond
+    freq = 440  # Hz
+    winsound.Beep(freq, duration)
