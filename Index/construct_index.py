@@ -8,6 +8,7 @@ from nltk.corpus import stopwords
 from collections import defaultdict
 import math
 import winsound
+import json
 
 class index():
     '''Calculate an inverse index of a corpus'''
@@ -21,11 +22,11 @@ class index():
     '''document_index is the mapping of terms to their doc_id (record of which documents a term appeared in) (AKA posting list)'''
     document_index = defaultdict(list)
 
-    '''tf_idf_score keeps track of the tf-idf score of each term'''
-    tf_idf_weight = defaultdict(float)
-
     '''doc_term_count is the number of times a key term appeared in a specific document.'''
-    doc_term_count = defaultdict(lambda: defaultdict(int))
+    doc_term_count = defaultdict(lambda: defaultdict(lambda: list()))
+
+    '''loaded_dict is a dictionary to compile all required info into a single data structure, so it can be printed to a JSON file'''
+    loaded_dict = dict(list(defaultdict(float)))
 
     stop_words = set(stopwords.words('english'))
     documents = 0
@@ -34,7 +35,7 @@ class index():
 
     def __init__(self):
         '''Count directories in root dir, for idf calculation'''
-        root = "..\\WEBPAGES_RAW\\"
+        root = "..\\WEBPAGES_RAW\\4"
         for root, dirs, files in os.walk(root):
             self.documents += len(files)
 
@@ -68,7 +69,7 @@ class index():
 
     def build_index(self):
         '''Build the index.  Loops through all files, passes to helper functions to parse html and tokenize/stem'''
-        root = "..\\WEBPAGES_RAW\\"
+        root = "..\\WEBPAGES_RAW\\4"
         '''Loop through all the dirs, extract content in each file.'''
         for path, subdirs, files in os.walk(root):
             for current_file in files:
@@ -162,25 +163,32 @@ class index():
             pass
         return False
 
+
     def print_report(self):
         '''print data required for report.'''
-        f = open('index.txt', 'w')
-        print "Unique words: " + str(self.unique_words + self.stop_words.__len__())
-        f.write("Unique words: " + str(self.unique_words + self.stop_words.__len__()))
-        print "Total documents: " + str(self.documents)
-        f.write("\nTotal documents: " + str(self.documents) + "\n")
 
+        '''Read the JSON file into memory'''
+        urls = json.load(open('..\\WEBPAGES_RAW\\bookkeeping.json'))
+
+
+        f = open('index.json', 'w')
+        print "Unique words: " + str(self.unique_words + self.stop_words.__len__())
+        #f.write("Unique words: " + str(self.unique_words + self.stop_words.__len__()))
+        print "Total documents: " + str(self.documents)
+        #f.write("\nTotal documents: " + str(self.documents) + "\n")
+        #f.write("{")
+        json.dump(self.doc_term_count, f)
         for token3 in self.doc_term_count:
-            print "Term: " + str(token3)
-            f.write("Term: " + str(token3))
+            #f.write("Term: " + str(token3))
             for doc in self.doc_term_count[token3]:
                 tf = self.calculate_tf(self.doc_term_count[token3][doc])
                 idf = self.calculate_idf(len(self.document_index[token3]))
                 tf_idf = tf * idf
-                print "\t" + str(doc) + ": " + str(tf_idf)
-                f.write("\n\t" + str(doc) + ": " + str(tf_idf))
+                self.doc_term_count[token3][doc].append(tf_idf)
+                #print "\t" + str(doc) + ": " + str(tf_idf)
+                #f.write("\n\t" + str(doc) + ": " + str(tf_idf))
+        #f.write("}")
         f.close()
-        print "I work hard every fucking day."
 
 
 
