@@ -81,7 +81,7 @@ class Index:
         '''Loop through all the dirs, extract content in each file.'''
 
         bookkeeper = json.load(open("..\\WEBPAGES_RAW\\bookkeeping.json"))
-        print bookkeeper
+        #print bookkeeper
         for path, subdirs, files in os.walk(root):
             for current_file in files:
                 '''clear term_frequency for next HTML file'''
@@ -90,7 +90,7 @@ class Index:
                 parent_directory = path.split(os.path.sep)[-1]
                 '''Create the doc_id using parent directory and the current file.'''
                 doc_id = str(parent_directory + "\\" + current_file)
-                print doc_id
+                page_key = str(parent_directory + "/" + current_file)
                 current_path = path + "\\" + current_file
                 html_source = open(current_path).read()
                 tokens = self.tokenize(self.text_from_html(html_source))
@@ -108,12 +108,16 @@ class Index:
                     doc_id is the current document.  document_index '''
                 for token2 in tokens:
                     self.doc_term_count[token2] = dict()
-                    print bookkeeper[str(doc_id)]
-                    #self.doc_term_count[token2][doc_id] = term_data(bookkeeper[doc_id], 0.0, )
+                    #print bookkeeper[page_key]
+                    self.doc_term_count[token2][doc_id] = term_data(bookkeeper[page_key], 0.0, )
 
         for token5 in self.doc_term_count:
             for doc5 in self.doc_term_count[token5]:
-                print self.doc_term_count[token5][doc5]
+                print "Term:  " + str(token5)
+                print "Document: " + str(doc_id)
+                print self.doc_term_count[token5][doc5].url
+                print self.doc_term_count[token5][doc5].tf_idf
+                print self.doc_term_count[token5][doc5].term_frequency
         #self.print_report()
         return
 
