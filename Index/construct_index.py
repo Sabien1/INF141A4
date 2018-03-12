@@ -108,17 +108,23 @@ class Index:
                     doc_id is the current document.  document_index '''
                 for token2 in tokens:
                     self.doc_term_count[token2] = dict()
-                    #print bookkeeper[page_key]
-                    self.doc_term_count[token2][doc_id] = term_data(bookkeeper[page_key], 0.0, )
-
-        for token5 in self.doc_term_count:
-            for doc5 in self.doc_term_count[token5]:
-                print "Term:  " + str(token5)
-                print "Document: " + str(doc_id)
-                print self.doc_term_count[token5][doc5].url
-                print self.doc_term_count[token5][doc5].tf_idf
-                print self.doc_term_count[token5][doc5].term_frequency
-        #self.print_report()
+                    # print token2
+                    # print page_key
+                    self.doc_term_count[token2][doc_id] = term_data(bookkeeper[page_key], 0.0, self.term_frequency[token2])
+                    #self.doc_term_count[token2][doc_id].print_members()
+                    #print ""
+        for token3 in self.doc_term_count:
+            #f.write("Term: " + str(token3))
+            for doc in self.doc_term_count[token3]:
+                tf = self.calculate_tf(self.doc_term_count[token3][doc].term_frequency)
+                idf = self.calculate_idf(len(self.document_index[token3]))
+                tf_idf_score = tf * idf
+                self.doc_term_count[token3][doc].tf_idf = tf_idf_score
+                print "Term: " + token3
+                print "Document: " + doc
+                print "Data: "
+                self.doc_term_count[token3][doc].print_members()
+                print ""
         return
 
     def tokenize(self, raw_input):
@@ -192,21 +198,21 @@ class Index:
         #f.write("\nTotal documents: " + str(self.documents) + "\n")
         #f.write("{")
 
-        for token3 in self.doc_term_count:
-            #f.write("Term: " + str(token3))
-            for doc in self.doc_term_count[token3]:
-                tf = self.calculate_tf(self.doc_term_count[token3][doc].term_frequency)
-                idf = self.calculate_idf(len(self.document_index[token3]))
-                tf_idf_score = tf * idf
-                self.doc_term_count[token3][doc].tf_idf = tf_idf_score
-                #print "\t" + str(doc) + ": " + str(tf_idf)
-                #f.write("\n\t" + str(doc) + ": " + str(tf_idf))
-        #f.write("}")
-        for token4 in self.doc_term_count:
-            for doc2 in self.doc_term_count[token4]:
-                print token4
-                print self.doc_term_count[token4][doc2].tf_idf
-                print ""
+        # for token3 in self.doc_term_count:
+        #     #f.write("Term: " + str(token3))
+        #     for doc in self.doc_term_count[token3]:
+        #         tf = self.calculate_tf(self.doc_term_count[token3][doc].term_frequency)
+        #         idf = self.calculate_idf(len(self.document_index[token3]))
+        #         tf_idf_score = tf * idf
+        #         self.doc_term_count[token3][doc].tf_idf = tf_idf_score
+        #         #print "\t" + str(doc) + ": " + str(tf_idf)
+        #         #f.write("\n\t" + str(doc) + ": " + str(tf_idf))
+        # #f.write("}")
+        # for token4 in self.doc_term_count:
+        #     for doc2 in self.doc_term_count[token4]:
+        #         print token4
+        #         print self.doc_term_count[token4][doc2].tf_idf
+        #         print ""
 
         f.close()
 

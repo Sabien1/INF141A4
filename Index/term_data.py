@@ -16,7 +16,10 @@ class term_data():
         '''frequency is the term frequency within the specified document (not currently used)'''
         self.term_frequency = str_term_frequency
 
-
+    def print_members(self):
+        print self.url
+        print self.tf_idf
+        print self.term_frequency
 
 
 if __name__ == "__main__":
