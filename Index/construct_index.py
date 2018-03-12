@@ -6,9 +6,11 @@ from bs4.element import Comment
 import unicodedata
 from nltk.corpus import stopwords
 from collections import defaultdict
+from term_data import term_data
 import math
 import winsound
 import json
+import jsonpickle
 
 class index():
     '''Calculate an inverse index of a corpus'''
@@ -23,7 +25,7 @@ class index():
     document_index = defaultdict(list)
 
     '''doc_term_count is the number of times a key term appeared in a specific document.'''
-    doc_term_count = defaultdict(lambda: defaultdict(lambda: list()))
+    doc_term_count = dict(dict())
 
     '''loaded_dict is a dictionary to compile all required info into a single data structure, so it can be printed to a JSON file'''
     loaded_dict = dict(list(defaultdict(float)))
@@ -77,7 +79,7 @@ class index():
                 self.term_frequency.clear()
                 '''Get the parent directory, used to map terms to "doc_ID"'''
                 parent_directory = path.split(os.path.sep)[-1]
-                ''''''
+                '''Create the doc_ID using parent directory and the current file.'''
                 doc_ID = str(parent_directory + "\\" + current_file)
 
                 current_path = path + "\\" + current_file
@@ -95,7 +97,9 @@ class index():
                     self.term_frequency[token] += 1
 
                 for token2 in tokens:
-                    self.doc_term_count[token2][doc_ID] = self.term_frequency[token2]
+                    for doc in self.document_index:
+                        self.doc_term_count[token2] = doc
+                    self.doc_term_count[token2][doc] = term_data('', 0.0, self.term_frequency[token2])
 
         #for token3 in self.doc_term_count:
             #print "Term: " + str(token3)
@@ -177,17 +181,23 @@ class index():
         print "Total documents: " + str(self.documents)
         #f.write("\nTotal documents: " + str(self.documents) + "\n")
         #f.write("{")
-        json.dump(self.doc_term_count, f)
+
         for token3 in self.doc_term_count:
             #f.write("Term: " + str(token3))
             for doc in self.doc_term_count[token3]:
-                tf = self.calculate_tf(self.doc_term_count[token3][doc])
+                tf = self.calculate_tf(self.doc_term_count[token3][doc].term_frequency)
                 idf = self.calculate_idf(len(self.document_index[token3]))
-                tf_idf = tf * idf
-                self.doc_term_count[token3][doc].append(tf_idf)
+                tf_idf_score = tf * idf
+                self.doc_term_count[token3][doc].tf_idf = tf_idf_score
                 #print "\t" + str(doc) + ": " + str(tf_idf)
                 #f.write("\n\t" + str(doc) + ": " + str(tf_idf))
         #f.write("}")
+        for token4 in self.doc_term_count:
+            for doc2 in self.doc_term_count[token4]:
+                print token4
+                print self.doc_term_count[token4][doc2].tf_idf
+                print ""
+
         f.close()
 
 

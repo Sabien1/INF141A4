@@ -1,0 +1,1 @@
+{"term": {"0": {"py/object": "__main__.term_data", "url": "test1", "term_frequency": 5, "tf_idf": 1.1}}, "term2": {"1": {"py/object": "__main__.term_data", "url": "test2", "term_frequency": 10, "tf_idf": 2.1}}}
