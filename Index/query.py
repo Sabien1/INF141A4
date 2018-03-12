@@ -37,12 +37,12 @@ class Query:
             #print ranking
         sorted_list = sorted(ranking.items(), key=operator.itemgetter(1), reverse=True)
         ranked_urls = list()
-        print sorted_list
         i = 0
         for v in sorted_list:
             ranked_urls.append(sorted_list[i][1][1])
+            i += 1
         print ranked_urls
-        return sorted_list
+        return ranked_urls
 
 
 if __name__ == "__main__":
