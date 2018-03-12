@@ -1,5 +1,6 @@
 from Tkinter import *
 import webbrowser
+import query
 
 class homepage:
     def __init__(self, master):
