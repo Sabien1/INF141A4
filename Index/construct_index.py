@@ -113,18 +113,7 @@ class Index:
                     self.doc_term_count[token2][doc_id] = term_data(bookkeeper[page_key], 0.0, self.term_frequency[token2])
                     #self.doc_term_count[token2][doc_id].print_members()
                     #print ""
-        for token3 in self.doc_term_count:
-            #f.write("Term: " + str(token3))
-            for doc in self.doc_term_count[token3]:
-                tf = self.calculate_tf(self.doc_term_count[token3][doc].term_frequency)
-                idf = self.calculate_idf(len(self.document_index[token3]))
-                tf_idf_score = tf * idf
-                self.doc_term_count[token3][doc].tf_idf = tf_idf_score
-                print "Term: " + token3
-                print "Document: " + doc
-                print "Data: "
-                self.doc_term_count[token3][doc].print_members()
-                print ""
+        self.print_report()
         return
 
     def tokenize(self, raw_input):
@@ -187,34 +176,31 @@ class Index:
     def print_report(self):
         """print data required for report."""
 
-        '''Read the JSON file into memory'''
-        urls = json.load(open('..\\WEBPAGES_RAW\\bookkeeping.json'))
-
-
+        '''Prepare to write JSON file'''
         f = open('index.json', 'w')
+
         print "Unique words: " + str(self.unique_words + self.stop_words.__len__())
-        #f.write("Unique words: " + str(self.unique_words + self.stop_words.__len__()))
         print "Total documents: " + str(self.documents)
-        #f.write("\nTotal documents: " + str(self.documents) + "\n")
-        #f.write("{")
-
-        # for token3 in self.doc_term_count:
-        #     #f.write("Term: " + str(token3))
-        #     for doc in self.doc_term_count[token3]:
-        #         tf = self.calculate_tf(self.doc_term_count[token3][doc].term_frequency)
-        #         idf = self.calculate_idf(len(self.document_index[token3]))
-        #         tf_idf_score = tf * idf
-        #         self.doc_term_count[token3][doc].tf_idf = tf_idf_score
-        #         #print "\t" + str(doc) + ": " + str(tf_idf)
-        #         #f.write("\n\t" + str(doc) + ": " + str(tf_idf))
-        # #f.write("}")
-        # for token4 in self.doc_term_count:
-        #     for doc2 in self.doc_term_count[token4]:
-        #         print token4
-        #         print self.doc_term_count[token4][doc2].tf_idf
-        #         print ""
-
+        for token3 in self.doc_term_count:
+            for doc in self.doc_term_count[token3]:
+                tf = self.calculate_tf(self.doc_term_count[token3][doc].term_frequency)
+                idf = self.calculate_idf(len(self.document_index[token3]))
+                tf_idf_score = tf * idf
+                self.doc_term_count[token3][doc].tf_idf = tf_idf_score
+                print "Term: " + token3
+                print "Document: " + doc
+                print "Data: "
+                self.doc_term_count[token3][doc].print_members()
+                print ""
+        f.write(jsonpickle.encode(self.doc_term_count, unpicklable=False))
         f.close()
+
+    def query(self, query_terms):
+        index_json = json.load(open(".\\index.json"))
+        for i in query_terms:
+            print "Queried for " + str(i)
+            print "Found in file: "
+            print index_json[i]
 
 
 
@@ -224,3 +210,5 @@ if __name__ == "__main__":
     duration = 1000  # millisecond
     freq = 440  # Hz
     winsound.Beep(freq, duration)
+
+    test.query(["curresnam"])

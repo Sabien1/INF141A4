@@ -17,9 +17,9 @@ class term_data():
         self.term_frequency = str_term_frequency
 
     def print_members(self):
-        print self.url
-        print self.tf_idf
-        print self.term_frequency
+        print "URL: " + self.url
+        print "tf.idf score: " + str(self.tf_idf)
+        print "Frequency: " + str(self.term_frequency)
 
 
 if __name__ == "__main__":
