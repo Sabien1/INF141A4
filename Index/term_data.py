@@ -5,7 +5,7 @@ import jsonpickle
 class term_data():
     '''Object definition for a term_data object.  Contains data members to keep track of information for search terms'''
 
-    def __init__(self, str_url, str_tf_idf, str_term_frequency):
+    def __init__(self, str_url=None, str_tf_idf=0.0, str_term_frequency=0):
 
         '''url holds the URL that pairs with the document ID'''
         self.url = str_url

@@ -12,8 +12,9 @@ import winsound
 import json
 import jsonpickle
 
-class index():
-    '''Calculate an inverse index of a corpus'''
+
+class Index:
+    """Calculate an inverse index of a corpus"""
 
     '''term_unique_count is dictionary to keep track of total unique occurrances of each term in entire corpus'''
     term_unique_count = dict()
@@ -21,13 +22,15 @@ class index():
     '''term_frequency is the number of times a term appears in a given document'''
     term_frequency = defaultdict(int)
 
-    '''document_index is the mapping of terms to their doc_id (record of which documents a term appeared in) (AKA posting list)'''
+    '''document_index is the mapping of terms to their doc_id (record of which documents a term appeared in)
+        (AKA posting list)'''
     document_index = defaultdict(list)
 
     '''doc_term_count is the number of times a key term appeared in a specific document.'''
     doc_term_count = dict(dict())
 
-    '''loaded_dict is a dictionary to compile all required info into a single data structure, so it can be printed to a JSON file'''
+    '''loaded_dict is a dictionary to compile all required info into a single data structure, 
+        so it can be printed to a JSON file'''
     loaded_dict = dict(list(defaultdict(float)))
 
     stop_words = set(stopwords.words('english'))
@@ -36,12 +39,13 @@ class index():
     index_size = 0
 
     def __init__(self):
-        '''Count directories in root dir, for idf calculation'''
+        """Count directories in root dir, for idf calculation"""
         root = "..\\WEBPAGES_RAW\\4"
         for root, dirs, files in os.walk(root):
             self.documents += len(files)
 
-    '''Function tag_visible sourced from https://stackoverflow.com/questions/1936466/beautifulsoup-grab-visible-webpage-text'''
+    '''Function tag_visible sourced from 
+        https://stackoverflow.com/questions/1936466/beautifulsoup-grab-visible-webpage-text'''
     def tag_visible(self, element):
         '''Detects visible content on page, returns true if it is visible'''
         if element.parent.name in ['style', 'script', 'head', 'title', 'meta', '[document]']:
@@ -50,7 +54,8 @@ class index():
             return False
         return True
 
-    '''Function text_from_html sourced from https://stackoverflow.com/questions/1936466/beautifulsoup-grab-visible-webpage-text'''
+    '''Function text_from_html sourced from 
+        https://stackoverflow.com/questions/1936466/beautifulsoup-grab-visible-webpage-text'''
     def text_from_html(self, body):
         '''extract all visible text from html document'''
         soup = BeautifulSoup(body, 'html.parser')
@@ -70,17 +75,21 @@ class index():
         return wtf
 
     def build_index(self):
-        '''Build the index.  Loops through all files, passes to helper functions to parse html and tokenize/stem'''
+        """Build the index.  Loops through all files, passes to helper functions to parse html and tokenize/stem"""
+
         root = "..\\WEBPAGES_RAW\\4"
         '''Loop through all the dirs, extract content in each file.'''
+
+        bookkeeper = json.load(open("..\\WEBPAGES_RAW\\bookkeeping.json"))
+        print bookkeeper
         for path, subdirs, files in os.walk(root):
             for current_file in files:
                 '''clear term_frequency for next HTML file'''
                 self.term_frequency.clear()
-                '''Get the parent directory, used to map terms to "doc_ID"'''
+                '''Get the parent directory, used to map terms to "doc_id"'''
                 parent_directory = path.split(os.path.sep)[-1]
-                '''Create the doc_ID using parent directory and the current file.'''
-                doc_ID = str(parent_directory + "\\" + current_file)
+                '''Create the doc_id using parent directory and the current file.'''
+                doc_id = str(parent_directory + "\\" + current_file)
 
                 current_path = path + "\\" + current_file
                 html_source = open(current_path).read()
@@ -93,26 +102,23 @@ class index():
                     else:
                         self.term_unique_count[token] = 1
                         self.unique_words = self.unique_words + 1
-                    self.document_index[token].append(doc_ID)
+                    self.document_index[token].append(doc_id)
                     self.term_frequency[token] += 1
-
+                '''At this time, 'tokens' holds a list of every token in the current document.
+                    doc_id is the current document.  document_index '''
                 for token2 in tokens:
-                    for doc in self.document_index:
-                        self.doc_term_count[token2] = doc
-                    self.doc_term_count[token2][doc] = term_data('', 0.0, self.term_frequency[token2])
+                    self.doc_term_count[token2] = dict()
+                    print bookkeeper[doc_id]
+                    #self.doc_term_count[token2][doc_id] = term_data(bookkeeper[doc_id], 0.0, )
 
-        #for token3 in self.doc_term_count:
-            #print "Term: " + str(token3)
-            #for doc in self.doc_term_count[token3]:
-               # tf = self.calculate_tf(self.doc_term_count[token3][doc])
-               # idf = self.calculate_idf(len(self.document_index[token3]))
-               # tf_idf = tf * idf
-               # print "\t" + str(doc) + ": " + str(tf_idf)
-        self.print_report()
+        for token5 in self.doc_term_count:
+            for doc5 in self.doc_term_count[token5]:
+                print self.doc_term_count[token5][doc5]
+        #self.print_report()
         return
 
     def tokenize(self, raw_input):
-        '''Function takes a string and splits it into a list of individual words, mutated to lowercase'''
+        """Function takes a string and splits it into a list of individual words, mutated to lowercase"""
 
         '''tokenize the input, creates a list of strings'''
 
@@ -124,7 +130,7 @@ class index():
         return filtered_list
 
     def stem(self, token_list):
-        '''Function takes a list of strings and stems each string'''
+        """Function takes a list of strings and stems each string"""
         '''create a stemmer object'''
         stemmer = SnowballStemmer('english', ignore_stopwords=True)
         stemmed_list = []
@@ -135,7 +141,7 @@ class index():
         return stemmed_list
 
     def remove_number_tokens(self, token_list):
-        '''parse the list and remove all tokens that are numbers only.'''
+        """parse the list and remove all tokens that are numbers only."""
         length = token_list.__len__()
         i = 0
         while i < length:
@@ -147,13 +153,13 @@ class index():
         return token_list
 
     def normalize_unicode(self, string):
-        '''convert any string of unicode into ascii'''
+        """convert any string of unicode into ascii"""
         string = unicodedata.normalize('NFKD', string).encode('ascii', 'ignore')
         return string
 
     '''is_number function sourced from https://www.pythoncentral.io/how-to-check-if-a-string-is-a-number-in-python-including-unicode/'''
     def is_number(self, s):
-        '''determine if the string s is a digit.'''
+        """determine if the string s is a digit."""
         try:
             float(s)
             return True
@@ -169,7 +175,7 @@ class index():
 
 
     def print_report(self):
-        '''print data required for report.'''
+        """print data required for report."""
 
         '''Read the JSON file into memory'''
         urls = json.load(open('..\\WEBPAGES_RAW\\bookkeeping.json'))
@@ -203,7 +209,7 @@ class index():
 
 
 if __name__ == "__main__":
-    test = index()
+    test = Index()
     test.build_index()
     duration = 1000  # millisecond
     freq = 440  # Hz
