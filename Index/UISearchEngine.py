@@ -1,14 +1,11 @@
 from Tkinter import *
-
+import webbrowser
 
 class homepage:
     def __init__(self, master):
         self.master = master
         self.timer = 0
         self.query_true = None
-
-        # self.gifs = [PhotoImage(file="C:\Users\Alex Reynaga\Downloads\giphy (1).gif", format = "gif -index %i" %i) for i in range(40)]
-        #Try a for loop to go through all of the different images
 
         # self.frame = Frame(master)
 
@@ -18,9 +15,10 @@ class homepage:
         self.welcome.grid(row=0,column=1, sticky = N+S+W+E)
         # self.welcome.pack()
 
-        self.image = PhotoImage(file="C:\Users\Alex Reynaga\Downloads\giphy (1).gif") #GIF Len = 40 frames
+        self.image = PhotoImage(file="C:\Users\Vy\Desktop\giphy_1.gif") #GIF Len = 40 frames
         self.pic = Label(image=self.image)
         self.pic.grid(row=1, column=1, sticky = N+S+W+E)
+
 
         # self.pic.image = self.image
         # self.pic.pack(fill=BOTH, expand=1)
@@ -51,12 +49,26 @@ class homepage:
 
 
     def update(self):
+
         if self.query_true == True:
             self.resultsLabel.selection_clear()
             self.resultsLabel = Label(self.master, text="Results for " + self.input + ":")
-            self.resultsLabel.grid(row=4,column=1,sticky = W)
+            r=0
+            
+            for text in (r"http://www.google.com",r"http://www.google.com",r"http://www.google.com"):
+                self.resultsLabel= Label(self.master,text=text,foreground="#0000ff")
+                self.resultsLabel.bind("<1>",lambda event,text=text: self.click_link(event,text))
+                self.resultsLabel.grid(row=4+r,column=1,sticky = W)
+                r=r+1        
+
         self.master.update()
 
+
+    def click_link(self, event, text):
+        print(text)
+        webbrowser.open_new(text)
+        
+        
 if __name__ == "__main__":
     root = Tk()
     root.title("Group 111's Search Engine")

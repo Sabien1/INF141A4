@@ -90,7 +90,7 @@ class Index:
                 parent_directory = path.split(os.path.sep)[-1]
                 '''Create the doc_id using parent directory and the current file.'''
                 doc_id = str(parent_directory + "\\" + current_file)
-
+                print doc_id
                 current_path = path + "\\" + current_file
                 html_source = open(current_path).read()
                 tokens = self.tokenize(self.text_from_html(html_source))
@@ -108,7 +108,7 @@ class Index:
                     doc_id is the current document.  document_index '''
                 for token2 in tokens:
                     self.doc_term_count[token2] = dict()
-                    print bookkeeper[doc_id]
+                    print bookkeeper[str(doc_id)]
                     #self.doc_term_count[token2][doc_id] = term_data(bookkeeper[doc_id], 0.0, )
 
         for token5 in self.doc_term_count:
