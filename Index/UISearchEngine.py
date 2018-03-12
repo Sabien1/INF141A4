@@ -15,7 +15,7 @@ class homepage:
         self.welcome.grid(row=0,column=1, sticky = N+S+W+E)
         # self.welcome.pack()
 
-        self.image = PhotoImage(file="C:\Users\Vy\Desktop\giphy_1.gif") #GIF Len = 40 frames
+        self.image = PhotoImage(file=".\gif.gif") #GIF Len = 40 frames
         self.pic = Label(image=self.image)
         self.pic.grid(row=1, column=1, sticky = N+S+W+E)
 

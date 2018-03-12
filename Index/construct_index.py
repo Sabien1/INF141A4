@@ -103,11 +103,14 @@ class Index:
                         self.term_unique_count[token] = 1
                         self.unique_words = self.unique_words + 1
                     self.document_index[token].append(doc_id)
+                    #print self.document_index[token]
+                    #print self.document_index
                     self.term_frequency[token] += 1
                 '''At this time, 'tokens' holds a list of every token in the current document.
                     doc_id is the current document.  document_index '''
                 for token2 in tokens:
-                    self.doc_term_count[token2] = dict()
+                    if token2 not in self.doc_term_count:
+                        self.doc_term_count[token2] = dict()
                     # print token2
                     # print page_key
                     self.doc_term_count[token2][doc_id] = term_data(bookkeeper[page_key], 0.0, self.term_frequency[token2])
@@ -177,26 +180,38 @@ class Index:
         """print data required for report."""
 
         '''Prepare to write JSON file'''
-        f = open('index.json', 'w')
+        f = open('json_test.json', 'w')
 
-        print "Unique words: " + str(self.unique_words + self.stop_words.__len__())
-        print "Total documents: " + str(self.documents)
-        for token3 in self.doc_term_count:
-            for doc in self.doc_term_count[token3]:
-                tf = self.calculate_tf(self.doc_term_count[token3][doc].term_frequency)
-                idf = self.calculate_idf(len(self.document_index[token3]))
-                tf_idf_score = tf * idf
-                self.doc_term_count[token3][doc].tf_idf = tf_idf_score
-                print "Term: " + token3
-                print "Document: " + doc
-                print "Data: "
-                self.doc_term_count[token3][doc].print_members()
-                print ""
-        f.write(jsonpickle.encode(self.doc_term_count, unpicklable=False))
-        f.close()
+        for k in self.doc_term_count:
+            #print "{\"" + str(k) + "\"" + ": "
+            f.write("{\"" + str(k) + "\"" + ": ")
+            for v in self.doc_term_count[k]:
+                #print jsonpickle.encode(self.doc_term_count[k][v], unpicklable=False)
+                f.write(jsonpickle.encode(self.doc_term_count[k][v], unpicklable=False))
+                #print ","
+                f.write(",")
+        f.write("}")
+
+        # f = open('index.json', 'w')
+        #
+        # print "Unique words: " + str(self.unique_words + self.stop_words.__len__())
+        # print "Total documents: " + str(self.documents)
+        # for token3 in self.doc_term_count:
+        #     for doc in self.doc_term_count[token3]:
+        #         tf = self.calculate_tf(self.doc_term_count[token3][doc].term_frequency)
+        #         idf = self.calculate_idf(len(self.document_index[token3]))
+        #         tf_idf_score = tf * idf
+        #         self.doc_term_count[token3][doc].tf_idf = tf_idf_score
+        #         print "Term: " + token3
+        #         print "Document: " + doc
+        #         print "Data: "
+        #         self.doc_term_count[token3][doc].print_members()
+        #         print ""
+        # f.write(jsonpickle.encode(self.doc_term_count, unpicklable=False))
+        # f.close()
 
     def query(self, query_terms):
-        index_json = json.load(open(".\\index.json"))
+        index_json = json.load(open(".\\json_test.json"))
         for i in query_terms:
             print "Queried for " + str(i)
             print "Found in file: "
@@ -211,4 +226,4 @@ if __name__ == "__main__":
     freq = 440  # Hz
     winsound.Beep(freq, duration)
 
-    test.query(["curresnam"])
+    test.query(["richardscafidirichardscafidi"])
